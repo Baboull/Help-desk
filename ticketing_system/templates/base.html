@@ -168,9 +168,7 @@
 <body class="flex min-h-screen">
 
 {% if user.is_authenticated %}
-<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
 <aside class="sidebar py-4 px-3 flex flex-col">
-    <!-- Brand -->
     <a href="/" class="flex items-center gap-2 px-2 mb-6">
         <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background:var(--accent)">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
@@ -178,7 +176,6 @@
         <span class="font-semibold text-sm" style="color:var(--text-primary)">SupportHub</span>
     </a>
 
-    <!-- Navigation -->
     <nav class="flex-1 space-y-0.5">
         <p class="section-label px-2 mb-2">Menu</p>
 
@@ -215,7 +212,6 @@
         {% endif %}
     </nav>
 
-    <!-- Bottom: user info -->
     <div class="pt-3 mt-3" style="border-top:1px solid var(--border)">
         <div class="flex items-center gap-2 px-2 mb-2">
             <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:var(--accent);color:#fff">
@@ -237,7 +233,6 @@
 </aside>
 {% endif %}
 
-<!-- ═══════════════════ MAIN ═══════════════════ -->
 <div class="flex-1 flex flex-col min-w-0">
 
     {% if not user.is_authenticated %}

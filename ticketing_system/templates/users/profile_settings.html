@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Settings — SupportHub{% endblock %}
+{% block content %}
+
+<div class="mb-5">
+    <h1 class="text-base font-semibold" style="color:var(--text-primary)">Account Settings</h1>
+    <p class="text-xs mt-0.5" style="color:var(--text-muted)">Manage your personal information and security.</p>
+</div>
+
+<div class="max-w-2xl space-y-5">
+
+    <div class="card" style="border-radius:8px">
+        <div class="px-5 py-4" style="border-bottom:1px solid var(--border)">
+            <h2 class="text-sm font-semibold" style="color:var(--text-primary)">Profile Information</h2>
+            <p class="text-xs mt-0.5" style="color:var(--text-muted)">Update your name and email address.</p>
+        </div>
+
+        <div class="px-5 py-4 flex items-center gap-4" style="border-bottom:1px solid var(--border-muted)">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
+                 style="background:var(--accent);color:#fff">
+                {{ user.username|first|upper }}
+            </div>
+            <div>
+                <p class="text-sm font-semibold" style="color:var(--text-primary)">{{ user.username }}</p>
+                <p class="text-xs" style="color:var(--text-muted)">{{ user.get_role_display }}</p>
+            </div>
+        </div>
+
+        <form method="POST" class="px-5 py-5 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="update_profile" value="1">
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold mb-1.5" style="color:var(--text-primary)">First Name</label>
+                    <input type="text" name="first_name" value="{{ profile_form.instance.first_name }}"
+                           class="form-input" placeholder="First name" />
+                    {% for error in profile_form.first_name.errors %}
+                    <p class="mt-1 text-xs" style="color:#f85149">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1.5" style="color:var(--text-primary)">Last Name</label>
+                    <input type="text" name="last_name" value="{{ profile_form.instance.last_name }}"
+                           class="form-input" placeholder="Last name" />
+                    {% for error in profile_form.last_name.errors %}
+                    <p class="mt-1 text-xs" style="color:#f85149">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold mb-1.5" style="color:var(--text-primary)">Email Address</label>
+                <input type="email" name="email" value="{{ profile_form.instance.email }}"
+                       class="form-input" placeholder="you@example.com" />
+                {% for error in profile_form.email.errors %}
+                <p class="mt-1 text-xs" style="color:#f85149">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div style="padding-top:8px">
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card" style="border-radius:8px">
+        <div class="px-5 py-4" style="border-bottom:1px solid var(--border)">
+            <h2 class="text-sm font-semibold" style="color:var(--text-primary)">Change Password</h2>
+            <p class="text-xs mt-0.5" style="color:var(--text-muted)">Choose a strong password you don't use anywhere else.</p>
+        </div>
+        <form method="POST" class="px-5 py-5 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="change_password" value="1">
+
+            {% for field in password_form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-xs font-semibold mb-1.5"
+                       style="color:var(--text-primary)">{{ field.label }}</label>
+                <input type="password"
+                       name="{{ field.html_name }}"
+                       id="{{ field.id_for_label }}"
+                       class="form-input"
+                       placeholder="••••••••" />
+                {% if field.help_text %}
+                    <p class="mt-1 text-xs" style="color:var(--text-muted)">{{ field.help_text|striptags }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <div style="padding-top:8px">
+                <button type="submit" class="btn-primary">Update Password</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card px-5 py-4" style="border-radius:8px">
+        <p class="section-label mb-3">Account Info</p>
+        <dl class="space-y-2.5">
+            <div class="flex justify-between text-xs">
+                <dt style="color:var(--text-muted)">Username</dt>
+                <dd class="font-mono font-medium" style="color:var(--text-primary)">{{ user.username }}</dd>
+            </div>
+            <div class="flex justify-between text-xs">
+                <dt style="color:var(--text-muted)">Role</dt>
+                <dd class="font-medium" style="color:var(--text-primary)">{{ user.get_role_display }}</dd>
+            </div>
+            <div class="flex justify-between text-xs">
+                <dt style="color:var(--text-muted)">Member since</dt>
+                <dd style="color:var(--text-primary)">{{ user.date_joined|date:"M d, Y" }}</dd>
+            </div>
+        </dl>
+    </div>
+
+</div>
+
+{% endblock %}
