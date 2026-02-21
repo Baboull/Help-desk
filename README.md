@@ -1,4 +1,4 @@
-# SupportHub - Modern Django Ticketing System
+# - Modern Django Ticketing System
 
 A high-performance, role-based ticketing system built with **Django 5.1** and **Tailwind CSS**. Featuring a sleek **2026 Flat Design** with a **GitHub-inspired Dark Mode** aesthetic.
 
@@ -19,26 +19,31 @@ A high-performance, role-based ticketing system built with **Django 5.1** and **
 ## Quick Start
 
 ### 1. Clone & Set Up
+
 ```bash
-git clone <repository-url>
-cd ticketing_system
+git clone https://github.com/Dera2Salles/Help-desk.git
+cd Help-desk
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Run Migrations & Initialize
+
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
 ```
 
 ### 4. Launch Development Server
+
 ```bash
 python manage.py runserver
 ```
+
 Visit `http://127.0.0.1:8000/` to get started.
 
 ## User Roles & Permissions
@@ -67,4 +72,5 @@ Visit `http://127.0.0.1:8000/` to get started.
 - **Typography**: Inter (Google Fonts)
 
 ---
-*Built with ️ for 2026 Support Excellence.*
+
+_Built with ️ for 2026 Support Excellence._
