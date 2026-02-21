@@ -1,58 +1,54 @@
 {% extends 'base.html' %}
-
-{% block title %}Register - SupportHub{% endblock %}
-
+{% block title %}Create Account — SupportHub{% endblock %}
 {% block content %}
-<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div>
-            <h2 class="mt-2 text-center text-3xl font-extrabold text-gray-900">
-                Create an account
-            </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
-                Join SupportHub to manage your tickets
-            </p>
-        </div>
-        <form class="mt-8 space-y-6" method="POST">
-            {% csrf_token %}
-            <div class="space-y-4">
-                {% for field in form %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                            {{ field.label }}
-                        </label>
-                        <div class="mt-1">
-                            {{ field }}
-                        </div>
-                        {% if field.help_text %}
-                            <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
+<div class="min-h-[80vh] flex items-center justify-center py-10">
+    <div class="w-full max-w-[400px]">
 
-            <div>
-                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm transition-colors">
-                    Sign up
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3" style="background:var(--bg-overlay);border:1px solid var(--border)">
+                <svg class="w-6 h-6" style="color:var(--text-link)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            </div>
+            <h1 class="text-xl font-semibold" style="color:var(--text-primary)">Create your account</h1>
+            <p class="text-sm mt-1" style="color:var(--text-muted)">Join SupportHub today</p>
+        </div>
+
+        <div class="card p-5" style="border-radius:8px">
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-xs font-semibold mb-1.5" style="color:var(--text-primary)">
+                        {{ field.label }}
+                    </label>
+                    {% if field.field.widget.input_type == 'select' %}
+                        <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-input" style="height:32px">
+                            {% for val, label in field.field.choices %}
+                            <option value="{{ val }}" {% if field.value == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <input type="{{ field.field.widget.input_type }}"
+                               name="{{ field.html_name }}"
+                               id="{{ field.id_for_label }}"
+                               class="form-input"
+                               placeholder="{{ field.label }}"
+                               {% if field.value %}value="{{ field.value }}"{% endif %} />
+                    {% endif %}
+                    {% if field.help_text %}<p class="mt-1 text-xs" style="color:var(--text-muted)">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-primary w-full justify-center">
+                    Create account
                 </button>
-            </div>
-            
-            <div class="text-sm text-center">
-                <a href="{% url 'login' %}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                    Already have an account? Sign in
-                </a>
-            </div>
-        </form>
+            </form>
+        </div>
+
+        <div class="card mt-4 px-5 py-4 text-center text-sm" style="border-radius:8px;color:var(--text-muted)">
+            Already have an account?
+            <a href="{% url 'login' %}" style="color:var(--text-link)" class="font-medium ml-1 hover:underline">Sign in</a>
+        </div>
     </div>
 </div>
-
-<style type="text/tailwindcss">
-/* Add base Tailwind classes to Django generated fields for consistent look */
-input[type="text"], input[type="email"], input[type="password"], select {
-    @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
-}
-</style>
 {% endblock %}

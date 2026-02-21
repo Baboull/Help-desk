@@ -95,3 +95,16 @@ def ticket_detail(request, ticket_id):
         'is_staff': is_staff,
         'internal_notes': internal_notes,
     })
+
+@login_required
+def resolved_tickets(request):
+    """Public archive: all resolved/closed tickets visible to every logged-in user."""
+    query = request.GET.get('q', '').strip()
+    qs = Ticket.objects.filter(status__in=['resolved', 'closed']).order_by('-updated_at')
+    if query:
+        qs = qs.filter(title__icontains=query) | qs.filter(description__icontains=query)
+        qs = qs.distinct()
+    return render(request, 'tickets/resolved_tickets.html', {
+        'tickets': qs,
+        'query': query,
+    })

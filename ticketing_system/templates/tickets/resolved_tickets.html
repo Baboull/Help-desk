@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Resolved Tickets Archive — SupportHub{% endblock %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-5">
+    <div>
+        <h1 class="text-base font-semibold" style="color:var(--text-primary)">Resolved Archive</h1>
+        <p class="text-xs mt-0.5" style="color:var(--text-muted)">Browse all resolved and closed tickets. Open to everyone.</p>
+    </div>
+</div>
+
+<!-- Search bar -->
+<form method="GET" class="mb-5">
+    <div class="flex gap-2 max-w-lg">
+        <div class="relative flex-1">
+            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--text-muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" name="q" value="{{ query }}" placeholder="Search by title or description…"
+                   class="form-input pl-9" style="height:32px" />
+        </div>
+        <button type="submit" class="btn-ghost" style="height:32px">Search</button>
+        {% if query %}
+        <a href="{% url 'resolved_tickets' %}" class="btn-ghost" style="height:32px">Clear</a>
+        {% endif %}
+    </div>
+    {% if query %}
+    <p class="mt-2 text-xs" style="color:var(--text-muted)">{{ tickets|length }} result{{ tickets|length|pluralize }} for "<span style="color:var(--text-primary)">{{ query }}</span>"</p>
+    {% endif %}
+</form>
+
+<!-- Ticket list -->
+<div class="card overflow-hidden">
+    {% if tickets %}
+    <table class="w-full data-table">
+        <thead>
+            <tr>
+                <th class="text-left px-4 py-2.5">#</th>
+                <th class="text-left px-4 py-2.5">Subject</th>
+                <th class="text-left px-4 py-2.5">Client</th>
+                <th class="text-left px-4 py-2.5">Department</th>
+                <th class="text-left px-4 py-2.5">Status</th>
+                <th class="text-left px-4 py-2.5">Resolved</th>
+                <th class="px-4 py-2.5"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr class="ticket-row">
+                <td class="px-4 py-3 font-mono text-xs" style="color:var(--text-muted)">#{{ ticket.id }}</td>
+                <td class="px-4 py-3 font-medium max-w-xs" style="color:var(--text-primary)">{{ ticket.title|truncatechars:45 }}</td>
+                <td class="px-4 py-3 text-xs" style="color:var(--text-muted)">{{ ticket.client.username }}</td>
+                <td class="px-4 py-3 text-xs" style="color:var(--text-muted)">{{ ticket.department.name|default:"General" }}</td>
+                <td class="px-4 py-3"><span class="pill pill-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+                <td class="px-4 py-3 text-xs" style="color:var(--text-muted)">{{ ticket.updated_at|date:"M d, Y" }}</td>
+                <td class="px-4 py-3 text-right">
+                    <a href="{% url 'ticket_detail' ticket.id %}" style="color:var(--text-link)" class="text-xs font-medium hover:underline">Read →</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-16" style="color:var(--text-muted)">
+        <svg class="w-10 h-10 mb-3 opacity-25" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <p class="text-sm font-medium mb-1" style="color:var(--text-primary)">No resolved tickets found</p>
+        <p class="text-xs">{% if query %}Try a different search term.{% else %}Resolved tickets will appear here once agents close them.{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
