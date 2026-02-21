@@ -6,7 +6,8 @@ from core import views as core_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', user_views.register_view, name='register'),
-    path('', include('django.contrib.auth.urls')),  # Includes login, logout, etc.
+    path('', include('django.contrib.auth.urls')),  
     path('tickets/', include('tickets.urls')),
+    path('account/', include('users.urls')),
     path('', core_views.home_redirect, name='home'),
 ]
