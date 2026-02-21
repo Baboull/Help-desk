@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Edit User {{ target_user.username }} — SupportHub{% endblock %}
+{% block content %}
+
+<div class="mb-5 flex justify-between items-center">
+    <div>
+        <h1 class="text-base font-semibold" style="color:var(--text-primary)">Edit User</h1>
+        <p class="text-xs mt-0.5" style="color:var(--text-muted)">Updating details for <span class="font-medium text-white">{{ target_user.username }}</span>.</p>
+    </div>
+    <a href="{% url 'admin_management' %}" class="btn-ghost">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back
+    </a>
+</div>
+
+<div class="max-w-xl card p-6">
+    <form method="POST" class="space-y-5">
+        {% csrf_token %}
+
+        {% for field in user_form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-xs font-semibold mb-1.5" style="color:var(--text-primary)">
+                    {{ field.label }}
+                </label>
+                
+                {% if field.field.widget.input_type == 'checkbox' %}
+                    <div class="flex items-center gap-2 mt-1 mb-2">
+                        {{ field }}
+                        <span class="text-xs" style="color:var(--text-muted)">Check to activate/enable</span>
+                    </div>
+                {% elif field.field.widget.input_type == 'select' or field.name == 'role' or field.name == 'department' %}
+                    <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-input" style="height:32px">
+                        {% for val, label in field.field.choices %}
+                        <option value="{{ val }}" {% if field.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="{{ field.field.widget.input_type|default:'text' }}"
+                           name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                           class="form-input"
+                           {% if field.value %}value="{{ field.value }}"{% endif %} />
+                {% endif %}
+                
+                {% if field.help_text %}<p class="mt-1 text-xs" style="color:var(--text-muted)">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+
+        <div style="border-top:1px solid var(--border);padding-top:16px" class="flex justify-end gap-3 mt-4">
+            <a href="{% url 'admin_management' %}" class="btn-ghost">Cancel</a>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.querySelectorAll('input:not([type="checkbox"]), select, textarea').forEach(el => {
+        if (!el.classList.contains('form-input')) {
+            el.classList.add('form-input');
+        }
+    });
+</script>
+
+{% endblock %}

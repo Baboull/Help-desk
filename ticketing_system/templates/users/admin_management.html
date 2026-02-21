@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Admin Management — SupportHub{% endblock %}
+{% block content %}
+
+<div class="mb-5">
+    <h1 class="text-base font-semibold" style="color:var(--text-primary)">Admin Management</h1>
+    <p class="text-xs mt-0.5" style="color:var(--text-muted)">Manage system users and departments.</p>
+</div>
+
+<div class="space-y-6">
+
+    <div class="card overflow-hidden">
+        <div class="px-5 py-4 flex items-center justify-between" style="border-bottom:1px solid var(--border)">
+            <div>
+                <h2 class="text-sm font-semibold" style="color:var(--text-primary)">Departments</h2>
+                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Manage support teams and categories.</p>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left data-table whitespace-nowrap">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3.5">Name</th>
+                        <th class="px-5 py-3.5">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in departments %}
+                    <tr class="ticket-row text-xs">
+                        <td class="px-5 py-3.5 font-medium" style="color:var(--text-primary)">{{ dept.name }}</td>
+                        <td class="px-5 py-3.5" style="color:var(--text-muted)">{{ dept.description|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="px-5 py-8 text-center text-xs" style="color:var(--text-muted)">No departments found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="px-5 py-4" style="border-top:1px solid var(--border); background:var(--bg-subtle)">
+            <p class="text-xs font-semibold mb-3" style="color:var(--text-primary)">Create New Department</p>
+            <form method="POST" class="flex items-end gap-3">
+                {% csrf_token %}
+                <input type="hidden" name="create_department" value="1">
+                <div class="flex-1">
+                    <input type="text" name="name" class="form-input" placeholder="Department Name" required>
+                </div>
+                <div class="flex-1">
+                    <input type="text" name="description" class="form-input" placeholder="Description (optional)">
+                </div>
+                <button type="submit" class="btn-primary" style="flex-shrink:0">Add Department</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="card overflow-hidden">
+        <div class="px-5 py-4" style="border-bottom:1px solid var(--border)">
+            <h2 class="text-sm font-semibold" style="color:var(--text-primary)">Users</h2>
+            <p class="text-xs mt-0.5" style="color:var(--text-muted)">List of all registered users across the platform.</p>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left data-table whitespace-nowrap">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3.5">Username</th>
+                        <th class="px-5 py-3.5">Role</th>
+                        <th class="px-5 py-3.5">Department</th>
+                        <th class="px-5 py-3.5">Status</th>
+                        <th class="px-5 py-3.5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr class="ticket-row text-xs">
+                        <td class="px-5 py-3.5 font-medium flex items-center gap-2" style="color:var(--text-primary)">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-white" style="background:var(--accent);font-size:10px">{{ u.username|first|upper }}</div>
+                            {{ u.username }}
+                        </td>
+                        <td class="px-5 py-3.5" style="color:var(--text-muted)">{{ u.get_role_display }}</td>
+                        <td class="px-5 py-3.5" style="color:var(--text-muted)">{{ u.department.name|default:"-" }}</td>
+                        <td class="px-5 py-3.5">
+                            {% if u.is_active %}
+                                <span class="pill pill-resolved">Active</span>
+                            {% else %}
+                                <span class="pill pill-closed">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3.5 text-right">
+                            <a href="{% url 'admin_user_edit' u.id %}" class="btn-ghost" style="padding:0 8px; height:26px; font-size:11px">Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-5 py-8 text-center text-xs" style="color:var(--text-muted)">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

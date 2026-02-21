@@ -43,7 +43,7 @@
                                 {{ msg.sender.username }} · {{ msg.created_at|time:"H:i" }}
                             </p>
                             <div class="px-3.5 py-2 text-sm leading-relaxed {% if msg.sender == user %}bubble-me{% else %}bubble-them{% endif %}">
-                                {{ msg.content }}
+                                {{ msg.content|linebreaksbr }}
                             </div>
                         </div>
                     </div>
@@ -54,14 +54,18 @@
             </div>
 
             <div class="px-4 py-3" style="border-top:1px solid var(--border);background:var(--bg-subtle)">
-                <form method="POST" class="flex items-end gap-2">
-                    {% csrf_token %}
-                    <input type="hidden" name="chat_message" value="1">
-                    <textarea name="content" rows="1" id="chat-input" class="form-input flex-1" style="resize:none;height:34px" placeholder="Type a message… (Enter to send)"></textarea>
+                {% if ticket.status == 'resolved' or ticket.status == 'closed' %}
+                <div class="text-center text-xs font-medium" style="color:var(--text-muted); padding: 8px 0;">
+                    This ticket is {{ ticket.get_status_display|lower }}. Chat is disabled.
+                </div>
+                {% else %}
+                <form id="chat-form" class="flex items-end gap-2">
+                    <textarea id="chat-input" class="form-input flex-1" style="resize:none;height:34px" placeholder="Type a message… (Enter to send)"></textarea>
                     <button type="submit" class="btn-primary" style="height:34px;padding:0 14px;flex-shrink:0">
                         <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
                     </button>
                 </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -156,11 +160,64 @@
     if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
 
     const chatInput = document.getElementById('chat-input');
-    if (chatInput) {
+    const msgForm = document.getElementById('chat-form');
+
+    const ticketId = "{{ ticket.id }}";
+    const currentUserId = "{{ request.user.id }}";
+    
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const chatSocket = new WebSocket(
+        wsScheme + '://' + window.location.host + '/ws/chat/' + ticketId + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        
+        const isMe = data.sender_id == currentUserId;
+        const msgHtml = `
+            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-[72%]">
+                    <p class="text-xs mb-1 ${isMe ? 'text-right' : ''}" style="color:var(--text-muted)">
+                        ${data.sender_username} · ${data.time}
+                    </p>
+                    <div class="px-3.5 py-2 text-sm leading-relaxed ${isMe ? 'bubble-me' : 'bubble-them'}">
+                        ${data.message.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const emptyState = chatEl.querySelector('.text-center.py-10');
+        if (emptyState) emptyState.remove();
+        
+        chatEl.insertAdjacentHTML('beforeend', msgHtml);
+        chatEl.scrollTop = chatEl.scrollHeight;
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    if (msgForm && chatInput) {
+        msgForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (message) {
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                chatInput.value = '';
+            }
+        });
+
         chatInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                this.closest('form').submit();
+                msgForm.dispatchEvent(new Event('submit'));
             }
         });
     }
