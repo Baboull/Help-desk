@@ -16,7 +16,6 @@ def staff_dashboard(request):
     if request.user.role not in ['staff', 'admin'] and not request.user.is_staff:
         return redirect('client_dashboard')
     
-    # Staff sees tickets assigned to them, and unassigned tickets
     assigned_tickets = Ticket.objects.filter(assigned_to=request.user).order_by('-updated_at')
     unassigned_tickets = Ticket.objects.filter(assigned_to__isnull=True).order_by('-created_at')
     
@@ -44,7 +43,6 @@ def ticket_create(request):
 def ticket_detail(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
     
-    # Access control: only staff/admin or the ticket creator can view
     is_staff = request.user.role in ['staff', 'admin'] or request.user.is_staff
     if not is_staff and ticket.client != request.user:
         return redirect('client_dashboard')
