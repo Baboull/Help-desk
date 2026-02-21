@@ -2,53 +2,131 @@
 {% block title %}New Ticket — SupportHub{% endblock %}
 {% block content %}
 
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
     <div>
-        <h1 class="text-base font-semibold" style="color:var(--text-primary)">New Ticket</h1>
-        <p class="text-xs mt-0.5" style="color:var(--text-muted)">Describe your issue—we'll route it to the right team.</p>
+        <h1 class="text-xl font-bold tracking-tight" style="color:var(--text-primary)">Create a New Ticket</h1>
+        <p class="text-sm mt-1" style="color:var(--text-muted)">Provide the details below and we'll connect you with the right team.</p>
     </div>
-    <a href="{% url 'client_dashboard' %}" class="btn-ghost">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        Back
+    <a href="{% url 'client_dashboard' %}" class="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-white/5">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Dashboard
     </a>
 </div>
 
-<div class="max-w-2xl">
-    <div class="card p-6">
-        <form method="POST" class="space-y-5">
+<div class="max-w-3xl">
+    <div class="card p-8 shadow-2xl" style="border: 1px solid var(--border); background: var(--bg-card); border-radius: 16px;">
+        <form method="POST" class="space-y-6">
             {% csrf_token %}
 
-            {% for field in form %}
-            <div>
-                <label for="{{ field.id_for_label }}" class="block text-xs font-semibold mb-1.5" style="color:var(--text-primary)">
-                    {{ field.label }}
+            <div class="space-y-2">
+                <label for="id_title" class="block text-sm font-semibold" style="color:var(--text-primary)">
+                    {{ form.title.label }} <span style="color:#f85149">*</span>
                 </label>
-                {% if field.field.widget.input_type == 'select' %}
-                    <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form-input" style="height:32px">
-                        {% for val, label in field.field.choices %}
-                        <option value="{{ val }}" {% if field.value == val %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                {% elif field.field.widget.input_type == 'textarea' %}
-                    <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}" rows="6"
-                              class="form-input" placeholder="Describe the issue in detail...">{% if field.value %}{{ field.value }}{% endif %}</textarea>
-                {% else %}
-                    <input type="{{ field.field.widget.input_type }}"
-                           name="{{ field.html_name }}" id="{{ field.id_for_label }}"
-                           class="form-input" placeholder="{{ field.label }}"
-                           {% if field.value %}value="{{ field.value }}"{% endif %} />
-                {% endif %}
-                {% if field.help_text %}<p class="mt-1 text-xs" style="color:var(--text-muted)">{{ field.help_text }}</p>{% endif %}
-                {% for error in field.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
+                {{ form.title }}
+                <p class="text-xs mt-1" style="color:var(--text-muted)">A brief summary of your issue or request.</p>
+                {% for error in form.title.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
             </div>
-            {% endfor %}
 
-            <div style="border-top:1px solid var(--border);padding-top:16px" class="flex items-center gap-3">
-                <button type="submit" class="btn-primary">Submit Ticket</button>
-                <a href="{% url 'client_dashboard' %}" class="btn-ghost">Cancel</a>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label for="id_department" class="block text-sm font-semibold" style="color:var(--text-primary)">
+                        {{ form.department.label }} <span style="color:#f85149">*</span>
+                    </label>
+                    <div class="relative">
+                        {{ form.department }}
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none" style="color:var(--text-muted)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-1" style="color:var(--text-muted)">Which team should handle this?</p>
+                    {% for error in form.department.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="id_assigned_to" class="block text-sm font-semibold" style="color:var(--text-primary)">
+                        {{ form.assigned_to.label }}
+                    </label>
+                    <div class="relative">
+                        {{ form.assigned_to }}
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none" style="color:var(--text-muted)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-1" style="color:var(--text-muted)">Optional: Select a specific agent.</p>
+                    {% for error in form.assigned_to.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="id_description" class="block text-sm font-semibold" style="color:var(--text-primary)">
+                    {{ form.description.label }} <span style="color:#f85149">*</span>
+                </label>
+                {{ form.description }}
+                <p class="text-xs mt-1" style="color:var(--text-muted)">Provide as much context and detail as possible to help us resolve the issue.</p>
+                {% for error in form.description.errors %}<p class="mt-1 text-xs font-medium" style="color:#f85149">{{ error }}</p>{% endfor %}
+            </div>
+
+            <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-6 mt-4" style="border-top: 1px solid var(--border)">
+                <a href="{% url 'client_dashboard' %}" class="w-full sm:w-auto btn-ghost text-center px-5 py-2.5 rounded-lg font-medium transition-colors" style="color:var(--text-muted)">Cancel</a>
+                <button type="submit" class="w-full sm:w-auto btn-primary px-6 py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transform transition-all active:scale-95 shadow-md">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+                    Submit Ticket
+                </button>
             </div>
         </form>
     </div>
 </div>
 
+<script id="staff-data" type="application/json">
+    {{ staff_json|safe }}
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply tailwind classes to django rendered form inputs
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            if (el.type !== 'hidden' && el.type !== 'submit') {
+                el.classList.add('form-input', 'w-full', 'transition-all', 'duration-200');
+                if(el.tagName === 'SELECT') {
+                    el.style.appearance = 'none'; // removing default arrow for custom SVG one
+                    el.style.height = '42px'; 
+                    el.classList.add('pl-4', 'pr-10', 'rounded-lg');
+                } else if (el.tagName === 'INPUT') {
+                    el.style.height = '42px';
+                    el.classList.add('px-4', 'rounded-lg');
+                } else if (el.tagName === 'TEXTAREA') {
+                    el.classList.add('p-4', 'rounded-lg');
+                }
+            }
+        });
+
+        const staffData = JSON.parse(document.getElementById('staff-data').textContent);
+        const deptSelect = document.getElementById('id_department');
+        const assignedSelect = document.getElementById('id_assigned_to');
+        
+        function updateAssignedOptions() {
+            if (!deptSelect || !assignedSelect) return;
+            const deptId = deptSelect.value;
+            const currentValue = assignedSelect.value;
+            
+            // Clear current options
+            assignedSelect.innerHTML = '<option value="" selected>---------</option>';
+            
+            // Filter staff
+            const filteredStaff = deptId ? staffData.filter(user => user.department_id == deptId) : staffData;
+            
+            filteredStaff.forEach(user => {
+                const opt = document.createElement('option');
+                opt.value = user.id;
+                opt.textContent = user.username;
+                if (user.id == currentValue) opt.selected = true;
+                assignedSelect.appendChild(opt);
+            });
+        }
+        
+        if (deptSelect && assignedSelect) {
+            deptSelect.addEventListener('change', updateAssignedOptions);
+            updateAssignedOptions(); // initial load
+        }
+    });
+</script>
 {% endblock %}
