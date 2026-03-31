@@ -35,8 +35,14 @@ pip install -r requirements.txt
 
 ```bash
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py setup_defaults
 ```
+
+**Default Demo Credentials:**
+- **Admin**: `admin` / `admin123`
+- **Staff**: `staff` / `staff123`
+- **Client**: `client` / `client123`
+
 
 ### 4. Launch Development Server
 
